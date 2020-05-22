@@ -1,9 +1,19 @@
-const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const crypto = require("crypto")
+import * as functions from 'firebase-functions'
+import * as admin from 'firebase-admin'
+import * as  crypto from "crypto";
 
 admin.initializeApp();
 const db = admin.firestore();
+
+
+
+import * as TestSuite from 'firebase-functions-test';
+const test = TestSuite()
+test.mockConfig({ amplitude: { api_key: process.env.AMPLITUDE_API_KEY } });
+const Amplitude = require('@amplitude/node');
+const key = functions.config().amplitude.api_key
+const amplitudClient = Amplitude.init(key);
+
 
 const EventType = {
     'Payment': 'Payment',
@@ -24,7 +34,7 @@ const USER_COLLECTION = 'testUsers'
 
 
 // security
-const hashInBase64 = (payload) => {
+const hashInBase64 = (payload: Buffer) => {
     const secret = functions.config().cloudpayments.api_secret;
 
     return crypto.createHmac("sha256", secret)
@@ -32,9 +42,13 @@ const hashInBase64 = (payload) => {
         .digest("base64");
 }
 
-const signedByCloudPayments = (request) => {
-    const HMAC = request.header('Content-HMAC');
-    const hashedBody = hashInBase64(Buffer.from(request.rawBody, 'utf-8'));
+const signedByCloudPayments = (request: Request) => {
+    const HMAC = request.headers.get('Content-HMAC');
+    let hashedBody;
+    if (request.body) {
+        // @ts-ignore
+        hashedBody = hashInBase64(Buffer.from(request.rawBody, 'utf-8'));
+    }
     const res = hashedBody === HMAC;
 
     if (!res) {
@@ -93,28 +107,38 @@ const executeEvent = async (request, response, execute) => {
     }
 }
 
+const logToAmplitude = () => {
+    amplitudClient.logEvent({
+        event_type: 'Node.js Event',
+        user_id: 'datamonster@gmail.com',
+        location_lat: 37.77,
+        location_lng: -122.39,
+        ip: '127.0.0.1',
+    });
+}
+
 //  API 
 exports.pay = functions.https.onRequest(async (request, response) => {
-    executeEvent(request, response, async () => {
+    await executeEvent(request, response, async () => {
         await startSubscriptionForUser(request.body.AccountId);
         await logUserEvent(request.body, EventType.Payment);
     })
 });
 
 exports.recurrent = functions.https.onRequest(async (request, response) => {
-    executeEvent(request, response, async () => {
+    await executeEvent(request, response, async () => {
         await logUserEvent(request.body, EventType.Recurring);
     })
 });
 
 exports.check = functions.https.onRequest(async (request, response) => {
-    executeEvent(request, response, async () => {
+    await executeEvent(request, response, async () => {
         await logUserEvent(request.body, EventType.Check);
     })
 });
 
 exports.fail = functions.https.onRequest(async (request, response) => {
-    executeEvent(request, response, async () => {
+   await executeEvent(request, response, async () => {
         await logUserEvent(request.body, EventType.Fail);
     })
 });
@@ -131,4 +155,18 @@ const testActivateSubscription = async () => {
 
 }
 
-testActivateSubscription();
+// testActivateSubscription();
+
+const testLogAmplitudeEvent = async () => {
+    try {
+        logToAmplitude();
+
+
+    } catch (error) {
+        console.error("error happened", error.message);
+    }
+
+}
+
+// @ts-ignore
+await testLogAmplitudeEvent();
