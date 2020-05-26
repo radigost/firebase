@@ -1,12 +1,14 @@
 const test = require('firebase-functions-test')();
 test.mockConfig({ amplitude: { api_key: process.env.AMPLITUDE_API_KEY } });
-
+const format = require('date-fns/format');
 const AmplitudeEvent = require('./domain/AmplitudeEvent');
-const { logToAmplitude } = require('./amplitude');
+const { logToAmplitude, logPaymentToAmplitude, logFailToAmplitude, logRefundToAmplitude, logRecurrentToAmplitude } = require('./amplitude');
 const { startSubscriptionForUser } = require('./firebaseService');
+const Currency = require('./domain/Currency');
+const SubscriptionStatus = require('./domain/SubscriptionStatus');
 
 
-// tests
+// tests - subscription
 const testActivateSubscription = async () => {
     try {
         await startSubscriptionForUser("1407529623");
@@ -17,8 +19,7 @@ const testActivateSubscription = async () => {
 
 }
 
-// testActivateSubscription();
-
+//  tests - amplitude
 const testLogAmplitudeEvent = async () => {
     try {
         logToAmplitude({
@@ -28,7 +29,8 @@ const testLogAmplitudeEvent = async () => {
             transactionId: 'asdfas',
             amount: "50",
             currency: 'RUB',
-            testMode: true
+            testMode: true,
+            DateTime:"2020-05-21 05:30:59"
         });
     } catch (error) {
         console.error("error happened", error.message);
@@ -36,5 +38,84 @@ const testLogAmplitudeEvent = async () => {
 
 }
 
-testLogAmplitudeEvent();
+const testLogPaymentToAmplitude = () => {
+    const event = {
+        AccountId: "datamonster@gmail.com",
+        Amount: Math.random()*1000,
+        TransactionId: "sadf434wsa",
+        TestMode: "1",
+        Currency: Currency.RUB,
+        DateTime: format(new Date,"yyyy-MM-dd HH:mm:ss"),
+        Data:{
+            utm_source:"random_utm_source",
+            utm_campaign:"random_utm_campain",
+            utm_medium:"random_utm_medium",
+            productId:"inkognito_product_id"
+        }
+    }
+    logPaymentToAmplitude(event);
+}
 
+const testLogFailToAmplitude = () => {
+    const event = {
+        AccountId: "datamonster@gmail.com",
+        TransactionId: "sadf434wsa",
+        TestMode: "1",
+        Currency: Currency.RUB,
+        Reason: "Unsufficient Funds",
+        DateTime:"2020-05-21 05:30:59"
+
+    }
+    logFailToAmplitude(event);
+}
+
+const testLogRefundToAmplitude = () => {
+    const event = {
+        Amount: "1690",
+        AccountId: "datamonster@gmail.com",
+        TransactionId: "sadf434wsa",
+        DateTime:"2020-05-21 05:30:59"
+    }
+    logRefundToAmplitude(event);
+}
+
+
+const testLogRecurrentToAmplitude = () => {
+    const eventActive = {
+        AccountId: "datamonster@gmail.com",
+        TransactionId: "sadf434wsa",
+        Status: SubscriptionStatus.Active,
+        SuccessfulTransactionsNumber: 4,
+        Currency:Currency.RUB,
+        DateTime:"2020-05-21 05:30:59"
+    }
+    logRecurrentToAmplitude(eventActive);
+
+    const eventCancelled = {
+        AccountId: "datamonster@gmail.com",
+        TransactionId: "sadf434wsa",
+        Status: SubscriptionStatus.Cancelled,
+        SuccessfulTransactionsNumber: 4,
+        Currency:Currency.RUB,
+        DateTime:"2020-05-21 05:30:59",
+        
+    }
+    logRecurrentToAmplitude(eventCancelled);
+
+    const eventRejected = {
+        AccountId: "datamonster@gmail.com",
+        TransactionId: "sadf434wsa",
+        Status: SubscriptionStatus.Expired,
+        SuccessfulTransactionsNumber: 4,
+        Currency:Currency.RUB,
+        DateTime:"2020-05-21 05:30:59"
+    }
+    logRecurrentToAmplitude(eventRejected);
+}
+
+// testActivateSubscription();
+// testLogAmplitudeEvent();
+testLogPaymentToAmplitude();
+// testLogFailToAmplitude();
+// testLogRefundToAmplitude(); 
+// testLogRecurrentToAmplitude();

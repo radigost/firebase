@@ -1,10 +1,10 @@
 const functions = require('firebase-functions');
 const EventType = require('./src/domain/EventType');
 
-const {isSignedByCloudPayments} = require('./src/security');
-const {logUserEvent,startSubscriptionForUser} = require('./src/firebaseService');
-
-
+const { isSignedByCloudPayments } = require('./src/security');
+const { logUserEvent, startSubscriptionForUser } = require('./src/firebaseService');
+const { logPaymentToAmplitude, logFailToAmplitude, logRefundToAmplitude } = require('./src/amplitude');
+const { get } = require('lodash');
 
 // common middleware
 const executeEvent = async (request, response, execute) => {
@@ -13,6 +13,8 @@ const executeEvent = async (request, response, execute) => {
     }
     else {
         try {
+            console.log("hit with url", request.path);
+            console.log("hit with body ", request.body);
             if (isSignedByCloudPayments(request)) {
                 await execute();
                 response.send({ "code": 0 });
@@ -33,17 +35,25 @@ exports.pay = functions.https.onRequest(async (request, response) => {
     return executeEvent(request, response, async () => {
         await startSubscriptionForUser(request.body.AccountId);
         await logUserEvent(request.body, EventType.Payment);
+
+        const productId = get(request, 'body.Data.productId');
+        logPaymentToAmplitude(request.body, productId);
     })
 });
 
 exports.recurrent = functions.https.onRequest(async (request, response) => {
     return executeEvent(request, response, async () => {
         await logUserEvent(request.body, EventType.Recurring);
+
+        const productId = get(request, 'body.Data.productId');
+        logRecurrentToAmplitude(request.body, productId);
     })
 });
 
 exports.check = functions.https.onRequest(async (request, response) => {
     return executeEvent(request, response, async () => {
+
+
         await logUserEvent(request.body, EventType.Check);
     })
 });
@@ -51,6 +61,17 @@ exports.check = functions.https.onRequest(async (request, response) => {
 exports.fail = functions.https.onRequest(async (request, response) => {
     return executeEvent(request, response, async () => {
         await logUserEvent(request.body, EventType.Fail);
+
+        const productId = get(request, 'body.Data.productId');
+        logFailToAmplitude(request.body, productId);
+    })
+});
+
+exports.refund = functions.https.onRequest(async (request, response) => {
+    return executeEvent(request, response, async () => {
+
+        const productId = get(request, 'body.Data.productId');
+        logRefundToAmplitude(request.body, productId);
     })
 });
 

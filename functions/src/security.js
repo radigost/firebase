@@ -1,4 +1,5 @@
 const crypto = require("crypto")
+const functions = require('firebase-functions');
 
 // security
 const hashInBase64 = (payload) => {
