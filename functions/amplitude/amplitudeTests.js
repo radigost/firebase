@@ -1,23 +1,9 @@
-const test = require('firebase-functions-test')();
-test.mockConfig({ amplitude: { api_key: process.env.AMPLITUDE_API_KEY } });
 const format = require('date-fns/format');
-const AmplitudeEvent = require('./domain/AmplitudeEvent');
+const AmplitudeEvent = require('../domain/AmplitudeEvent');
 const { logToAmplitude, logPaymentToAmplitude, logFailToAmplitude, logRefundToAmplitude, logRecurrentToAmplitude } = require('./amplitude');
-const { startSubscriptionForUser } = require('./firebaseService');
-const Currency = require('./domain/Currency');
-const SubscriptionStatus = require('./domain/SubscriptionStatus');
 
-
-// tests - subscription
-const testActivateSubscription = async () => {
-    try {
-        await startSubscriptionForUser("1407529623");
-    }
-    catch (e) {
-        console.error("error", e.message);
-    }
-
-}
+const Currency = require('../domain/Currency');
+const SubscriptionStatus = require('../domain/SubscriptionStatus');
 
 //  tests - amplitude
 const testLogAmplitudeEvent = async () => {
@@ -84,7 +70,7 @@ const testLogRecurrentToAmplitude = () => {
     const eventActive = {
         AccountId: "datamonster@gmail.com",
         TransactionId: "sadf434wsa",
-        Status: SubscriptionStatus.Active,
+        Status: SubscriptionStatus.active,
         SuccessfulTransactionsNumber: 4,
         Currency:Currency.RUB,
         DateTime:"2020-05-21 05:30:59"
@@ -94,11 +80,11 @@ const testLogRecurrentToAmplitude = () => {
     const eventCancelled = {
         AccountId: "datamonster@gmail.com",
         TransactionId: "sadf434wsa",
-        Status: SubscriptionStatus.Cancelled,
+        Status: SubscriptionStatus.cancelled,
         SuccessfulTransactionsNumber: 4,
         Currency:Currency.RUB,
         DateTime:"2020-05-21 05:30:59",
-        
+
     }
     logRecurrentToAmplitude(eventCancelled);
 
@@ -117,5 +103,5 @@ const testLogRecurrentToAmplitude = () => {
 // testLogAmplitudeEvent();
 testLogPaymentToAmplitude();
 // testLogFailToAmplitude();
-// testLogRefundToAmplitude(); 
+// testLogRefundToAmplitude();
 // testLogRecurrentToAmplitude();

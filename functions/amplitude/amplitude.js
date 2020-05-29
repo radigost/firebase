@@ -1,42 +1,48 @@
 const functions = require('firebase-functions');
-const Currency = require('./domain/Currency');
-const Amplitude = require('@amplitude/node');
 const key = functions.config().amplitude.api_key
+const Amplitude = require('@amplitude/node');
 const amplitudClient = Amplitude.init(key);
+
 const getUnixTime = require('date-fns/getUnixTime');
 const parse = require('date-fns/parse');
 
-const AmplitudeEvent = require('./domain/AmplitudeEvent');
-const SubscriptionStatus = require('./domain/SubscriptionStatus');
+const AmplitudeEvent = require('../domain/AmplitudeEvent');
+const CloudPaymentsSubscriptionStatus = require('../domain/CloudPaymentsSubscriptionStatus');
+
+const Currency = require('../domain/Currency');
 const CONVERSION_RATE = 70;
 
+const {logger} = require('../logger')
+
 const logToAmplitude = ({
-    user_id,
-    event_type,
-    transactionId,
-    amount,
-    currency,
-    testMode,
-    totalFee = 0,
-    successfulTransactionsNumber,
-    reason,
-    dateTime,
-    country,
-    region,
-    city,
-    ip,
-    utm_source,
-    utm_campaign,
-    utm_medium,
-    productId
-}) => {
+                            user_id,
+                            event_type,
+                            transactionId,
+                            amount,
+                            currency,
+                            testMode,
+                            totalFee = 0,
+                            successfulTransactionsNumber,
+                            reason,
+                            dateTime,
+                            country,
+                            region,
+                            city,
+                            ip,
+                            utm_source,
+                            utm_campaign,
+                            utm_medium,
+                            productId,
+                            insertId
+                        }) => {
     try {
         const date = parse(dateTime, "yyyy-MM-dd HH:mm:ss", new Date());
         const event = {
             user_id,
+            insert_id: insertId,
             event_type,
             time: getUnixTime(date),
-            revenue: amount / CONVERSION_RATE - parseFloat(totalFee),
+            revenue: amount / CONVERSION_RATE - amount / CONVERSION_RATE * (1 - parseFloat(totalFee)),
             country,
             region,
             city,
@@ -44,9 +50,10 @@ const logToAmplitude = ({
             productId,
             event_properties: {
                 transactionId,
-                amount:Math.abs(amount),
+                amount: Math.abs(amount),
                 currency,
                 testMode,
+                is_debug_mode: parseInt(testMode) === 1,
                 successfulTransactionsNumber,
                 reason,
                 utm_source,
@@ -54,19 +61,19 @@ const logToAmplitude = ({
                 utm_medium
             },
         }
-        console.log("logging", event);
+        logger.debug("Start log event to Amplitude, %O", event);
         amplitudClient.logEvent(event);
     } catch (error) {
-        console.error("error happened", error.message);
+        logger.error("Cannot log to amplitude: ", error);
     }
 
 }
 
-const logPaymentToAmplitude = (event, productId) => {
+const logPaymentToAmplitude = (event, productId, insertId, serviceUID) => {
     let utm_source, utm_campaign, utm_medium;
     let totalFee = event.TotalFee || 0;
     const {
-        AccountId: user_id,
+
         Amount: amount,
         TransactionId: transactionId,
         TestMode: testMode,
@@ -83,6 +90,7 @@ const logPaymentToAmplitude = (event, productId) => {
         utm_campaign = event.Data.utm_campaign;
         utm_medium = event.Data.utm_medium;
     }
+    const user_id = serviceUID;
 
     if (user_id && amount && transactionId && transactionId && currency && dateTime) {
         logToAmplitude({
@@ -101,19 +109,26 @@ const logPaymentToAmplitude = (event, productId) => {
             utm_source,
             utm_campaign,
             utm_medium,
-            productId
+            productId,
+            insertId
         });
-    }
-    else {
-        console.error("will not send to amplitude dues to lack of mandatory properties!", { user_id, amount, transactionId, currency, dateTime })
+    } else {
+        console.error("will not send to amplitude dues to lack of mandatory properties!", {
+            user_id,
+            amount,
+            transactionId,
+            currency,
+            dateTime
+        })
     }
 
 }
 
-const logFailToAmplitude = (event, productId) => {
+const logFailToAmplitude = (event, productId, insertId, serviceUID) => {
     let utm_source, utm_campaign, utm_medium;
     const amount = 0;
-    const { AccountId: user_id,
+    const {
+
         TransactionId: transactionId,
         TestMode: testMode,
         Currency: currency,
@@ -125,6 +140,7 @@ const logFailToAmplitude = (event, productId) => {
         IpAddress: ip,
     } = event;
 
+    const user_id = serviceUID;
     if (event.Data) {
         utm_source = event.Data.utm_source;
         utm_campaign = event.Data.utm_campaign;
@@ -148,20 +164,26 @@ const logFailToAmplitude = (event, productId) => {
             utm_source,
             utm_campaign,
             utm_medium,
-            productId
+            productId,
+            insertId
         });
-    }
-    else {
-        console.error("will not send to amplitude dues to lack of mandatory properties!", { user_id, transactionId, currency, reason, dateTime })
+    } else {
+        console.error("will not send to amplitude dues to lack of mandatory properties!", {
+            user_id,
+            transactionId,
+            currency,
+            reason,
+            dateTime
+        })
     }
 }
 
-const logRefundToAmplitude = (event, productId) => {
+const logRefundToAmplitude = (event, productId, insertId, serviceUID) => {
     let utm_source, utm_campaign, utm_medium;
     const amount = -1 * event.Amount || 0;
     currency = Currency.RUB;
     const {
-        AccountId: user_id,
+
         TransactionId: transactionId,
         DateTime: dateTime,
         IpCountry: country,
@@ -169,7 +191,7 @@ const logRefundToAmplitude = (event, productId) => {
         IpCity: city,
         IpAddress: ip,
     } = event
-
+    const user_id = serviceUID;
     if (event.Data) {
         utm_source = event.Data.utm_source;
         utm_campaign = event.Data.utm_campaign;
@@ -191,39 +213,45 @@ const logRefundToAmplitude = (event, productId) => {
             utm_source,
             utm_campaign,
             utm_medium,
-            productId
+            productId,
+            insertId
         });
-    }
-    else {
-        console.error("will not send to amplitude dues to lack of mandatory properties!", { user_id, transactionId, amount, dateTime })
+    } else {
+        console.error("will not send to amplitude dues to lack of mandatory properties!", {
+            user_id,
+            transactionId,
+            amount,
+            dateTime
+        })
     }
 }
 
-const logRecurrentToAmplitude = (event , productId) => {
+const logRecurrentToAmplitude = (event, productId, insertId, serviceUID) => {
     let utm_source, utm_campaign, utm_medium;
     const amount = 0;
     const {
-        AccountId: user_id,
         Currency: currency,
         SuccessfulTransactionsNumber: successfulTransactionsNumber,
-        DateTime: dateTime,
+        DateTime: dateTime = new Date(),
         IpCountry: country,
         IpRegion: region,
         IpCity: city,
         IpAddress: ip,
     } = event;
+    const user_id = serviceUID
 
     if (event.Data) {
         utm_source = event.Data.utm_source;
         utm_campaign = event.Data.utm_campaign;
         utm_medium = event.Data.utm_medium;
-        
+
     }
 
     const mapCloudPaymentsEventsToAmplitudeEvents = {
-        [SubscriptionStatus.Active]: AmplitudeEvent.recurrentActive,
-        [SubscriptionStatus.Cancelled]: AmplitudeEvent.recurrentCancelled,
-        [SubscriptionStatus.Rejected]: AmplitudeEvent.recurrentRejected,
+        [CloudPaymentsSubscriptionStatus.Active]: AmplitudeEvent.recurrentActive,
+        [CloudPaymentsSubscriptionStatus.Cancelled]: AmplitudeEvent.recurrentCancelled,
+        [CloudPaymentsSubscriptionStatus.PastDue]: AmplitudeEvent.recurrentRejected,
+        [CloudPaymentsSubscriptionStatus.Rejected]: AmplitudeEvent.recurrentRejected,
     }
     const event_type = mapCloudPaymentsEventsToAmplitudeEvents[event.Status]
 
@@ -242,12 +270,24 @@ const logRecurrentToAmplitude = (event , productId) => {
             utm_source,
             utm_campaign,
             utm_medium,
-            productId
+            productId,
+            insertId
         });
-    }
-    else {
-        console.error("will not send to amplitude dues to lack of mandatory properties!", { user_id, currency, successfulTransactionsNumber, event_type, dateTime })
+    } else {
+        console.error("will not send to amplitude dues to lack of mandatory properties!", {
+            user_id,
+            currency,
+            successfulTransactionsNumber,
+            event_type,
+            dateTime
+        })
     }
 }
 
-module.exports = { logToAmplitude, logPaymentToAmplitude, logFailToAmplitude, logRefundToAmplitude, logRecurrentToAmplitude }
+module.exports = {
+    logToAmplitude,
+    logPaymentToAmplitude,
+    logFailToAmplitude,
+    logRefundToAmplitude,
+    logRecurrentToAmplitude
+}

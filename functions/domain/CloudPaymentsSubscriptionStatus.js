@@ -1,4 +1,4 @@
-const SubscriptionStatus = {
+const CloudPaymentsSubscriptionStatus = {
     'Active': 'Active',
     'PastDue': 'PastDue',
     'Cancelled': 'Cancelled',
@@ -7,4 +7,4 @@ const SubscriptionStatus = {
 }
 
 
-module.exports = SubscriptionStatus
+module.exports = CloudPaymentsSubscriptionStatus
