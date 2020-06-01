@@ -8,7 +8,7 @@ const parse = require('date-fns/parse');
 
 const AmplitudeEvent = require('../domain/AmplitudeEvent');
 const CloudPaymentsSubscriptionStatus = require('../domain/CloudPaymentsSubscriptionStatus');
-
+const {divide, subtract} = require('lodash');
 const Currency = require('../domain/Currency');
 const CONVERSION_RATE = 70;
 
@@ -37,12 +37,13 @@ const logToAmplitude = ({
                         }) => {
     try {
         const date = parse(dateTime, "yyyy-MM-dd HH:mm:ss", new Date());
+
         const event = {
             user_id,
             insert_id: insertId,
             event_type,
             time: getUnixTime(date),
-            revenue: amount / CONVERSION_RATE - amount / CONVERSION_RATE * (1 - parseFloat(totalFee)),
+            revenue: divide(subtract(amount, Math.sign(amount) * totalFee), CONVERSION_RATE),
             country,
             region,
             city,
