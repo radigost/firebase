@@ -6,7 +6,7 @@ let FieldValue = require('firebase-admin').firestore.FieldValue;
 
 const add = require('date-fns/add');
 const getUnixTime = require('date-fns/getUnixTime');
-const {get} = require('lodash');
+const {get,isEqual,toNumber} = require('lodash');
 
 const SubscriptionStatus = require('../domain/SubscriptionStatus');
 const SubscriptionProvider = require('../domain/SubscriptionProvider');
@@ -65,7 +65,7 @@ const startNewSubscriptionForUser = async ({accountId, email, type, productId, a
 const changeSubscriptionStatus = async ({accountId, status, activeTill, productId}) => {
     const type = SubscriptionProvider.cloudPayments;
     const event = {status}
-    if (activeTill) {
+    if (activeTill || isEqual(toNumber(activeTill), 0)) {
         event.activeTill = activeTill;
     }
     if (productId) {

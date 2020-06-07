@@ -184,7 +184,6 @@ const logRefundToAmplitude = (event, productId, insertId, serviceUID) => {
     const amount = -1 * event.Amount || 0;
     currency = Currency.RUB;
     const {
-
         TransactionId: transactionId,
         DateTime: dateTime,
         IpCountry: country,
