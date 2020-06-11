@@ -100,7 +100,6 @@ exports.refund = functions.https.onRequest(async (request, response) => {
         const payload = {
             accountId: request.body.AccountId,
             productId: getProductId(request),
-            status: SubscriptionStatus.cancelled,
             activeTill: 0
         }
         await changeSubscriptionStatus(payload)

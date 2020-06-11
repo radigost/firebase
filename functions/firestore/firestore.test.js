@@ -15,9 +15,7 @@ const {
     SubscriptionProvider
 } = require("./firestore");
 const SubscriptionStatus = require('../domain/SubscriptionStatus');
-const log4js = require("log4js");
-const logger = log4js.getLogger();
-logger.level = "debug";
+
 const {last, get} = require('lodash');
 
 const assert = require('chai').assert;
@@ -30,7 +28,23 @@ const setNewSubscriptionForUser = async (ACCOUNT_ID, USER_PAYLOAD, EVENT) => {
         logger.error(e)
     }
 }
-describe('Firebase', () => {
+
+xdescribe('Not a test - just convinient way to check data from production database', () => {
+    let user,subscription
+    before("", async () => {
+        //change to needed id
+        const id = "2"
+        user = await getUser(id);
+        subscription = await getUserSubscriptionByUserId(id);
+    })
+    it('should have user accountId', async () => {
+        // console.log("user:%O", user);
+        console.log("subscription:%O", subscription);
+        assert.equal(user.accountId, id);
+    });
+
+})
+xdescribe('Firebase', () => {
     const ACCOUNT_ID = `1407529623`
     const USER_PAYLOAD = {
         accountId: ACCOUNT_ID,
@@ -133,7 +147,7 @@ describe('Firebase', () => {
         })
     })
 
-    describe.only('#Change subscription status', () => {
+    describe('#Change subscription status', () => {
         describe(`##Event 'fail' `, () => {
             let subscriptionDoc;
             const SUBSCRIPTION_TYPE = SubscriptionStatus.billingRetry;
@@ -177,7 +191,7 @@ describe('Firebase', () => {
 });
 
 
-describe('Parse date from CP event', () => {
+xdescribe('Parse date from CP event', () => {
     describe('get date params from request payload', () => {
         const payload = {
             Interval: '12', Period: 'Month', StartDate: '2021-05-25 05:40:41'

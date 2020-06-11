@@ -6,7 +6,7 @@ let FieldValue = require('firebase-admin').firestore.FieldValue;
 
 const add = require('date-fns/add');
 const getUnixTime = require('date-fns/getUnixTime');
-const {get,isEqual,toNumber} = require('lodash');
+const {get, isEqual, toNumber} = require('lodash');
 
 const SubscriptionStatus = require('../domain/SubscriptionStatus');
 const SubscriptionProvider = require('../domain/SubscriptionProvider');
@@ -72,7 +72,16 @@ const changeSubscriptionStatus = async ({accountId, status, activeTill, productI
         event.productId = productId;
     }
     logger.debug(`Changing status for subscriptions ${type}_${accountId} on ${status}`)
-    return db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${type}_${accountId}`).update(event)
+    const subscriptionRef = db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${type}_${accountId}`)
+    const snapshot = await subscriptionRef.get();
+    if (snapshot.exists) {
+        return subscriptionRef.update(event);
+    } else {
+        logger.error(`Cannot change status of subscription, ${type}_${accountId} does not exist!`)
+        return Promise.resolve();
+    }
+
+
 }
 
 //
