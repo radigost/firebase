@@ -10,5 +10,6 @@
 
 // require('./amplitudeTests');
 require('../firestore/firestore.test');
+require('../import/importCsv.test');
 
 

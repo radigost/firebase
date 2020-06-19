@@ -1,3 +1,5 @@
+const {head} = require("lodash");
+
 const test = require('firebase-functions-test')({
     projectId: 'mo-meditations-firebase'
 });
@@ -12,6 +14,7 @@ const {
     clearUserSubscription,
     startNewSubscriptionForUser,
     getUserSubscriptionByUserId,
+    getUserByServiceUid,
     SubscriptionProvider
 } = require("./firestore");
 const SubscriptionStatus = require('../domain/SubscriptionStatus');
@@ -30,17 +33,18 @@ const setNewSubscriptionForUser = async (ACCOUNT_ID, USER_PAYLOAD, EVENT) => {
 }
 
 xdescribe('Not a test - just convinient way to check data from production database', () => {
-    let user,subscription
+    let users,subscription
     before("", async () => {
         //change to needed id
-        const id = "2"
-        user = await getUser(id);
-        subscription = await getUserSubscriptionByUserId(id);
+        const id = "vZife-mNYr45WnaSFDnuzJWTqPmkA9ay"
+        // user = await getUser(id);
+        users = await getUserByServiceUid(id);
+        // subscription = await getUserSubscriptionByUserId(id);
     })
     it('should have user accountId', async () => {
-        // console.log("user:%O", user);
-        console.log("subscription:%O", subscription);
-        assert.equal(user.accountId, id);
+        // console.log("user:%O", users);
+        // console.log("subscription:%O", subscription);
+        assert.equal(users.length,1);
     });
 
 })

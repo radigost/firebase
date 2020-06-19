@@ -106,6 +106,29 @@ const getUser = async (id) => {
     }
 }
 
+const getUserByServiceUid = async (id) => {
+    try {
+        logger.debug(`retrieveing user:${id} in ${USER_COLLECTION}`);
+        const snapshot = await db.collection(USER_COLLECTION).where('serviceUID', '==', id).get();
+        if (snapshot.empty){
+            console.log("No Such User")
+            return [];
+        }
+        else {
+            const usersPromise = []
+            snapshot.forEach(doc => {
+                usersPromise.push(doc.data())
+            });
+
+            // const usersPromise = snapshot.map(userRef=>userRef.data())
+            return usersPromise;
+        }
+    } catch (e) {
+        logger.error(e.message)
+        return e;
+    }
+}
+
 const clearUserSubscription = async (id) => {
     try {
         logger.debug(`clearing subscription array for user ${USER_COLLECTION}, ${id}`);
@@ -137,5 +160,6 @@ module.exports = {
     getUserSubscriptionByUserId: getUserSubscriptionByUserId,
     SubscriptionProvider,
     getPeriodFromPayload,
-    changeSubscriptionStatus
+    changeSubscriptionStatus,
+    getUserByServiceUid
 }
