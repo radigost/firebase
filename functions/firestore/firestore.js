@@ -110,17 +110,19 @@ const getUserByServiceUid = async (id) => {
     try {
         logger.debug(`retrieveing user:${id} in ${USER_COLLECTION}`);
         const snapshot = await db.collection(USER_COLLECTION).where('serviceUID', '==', id).get();
-        if (snapshot.empty){
-            console.log("No Such User")
+        if (snapshot.empty) {
+            console.log("No Such User - %s", id)
             return [];
-        }
-        else {
+        } else {
             const usersPromise = []
             snapshot.forEach(doc => {
                 usersPromise.push(doc.data())
             });
-
-            // const usersPromise = snapshot.map(userRef=>userRef.data())
+            if (usersPromise.length === 1) {
+                console.log("User exists - %s", id)
+            } else {
+                console.log("several entries found - %s for user %s", usersPromise.length, id)
+            }
             return usersPromise;
         }
     } catch (e) {

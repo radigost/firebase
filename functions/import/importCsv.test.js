@@ -8,8 +8,8 @@ const fs = require('fs');
 const assert = require('chai').assert;
 const expect = require('chai').expect;
 
-const {convert,splitUsersThatAreInDatabase,processEntries} = require('./importCsv');
-const saveFile = (fileData,filename)=>{
+const importCsv = require('./importCsv');
+const saveFile = (fileData, filename) => {
     fs.writeFile(filename, JSON.stringify(fileData), 'utf8', function (err) {
         if (err) {
             return console.log(err);
@@ -17,20 +17,22 @@ const saveFile = (fileData,filename)=>{
         console.log(`The file ${filename} was saved!`);
     });
 }
-describe('Converting csv to firebase structure', () => {
-    let result, emptyUsers, existedUsers,users
+xdescribe('Converting csv to firebase structure', () => {
+    let result, users, nonExistedUsers, existedUsers,data
     before("", async () => {
-        result = await convert();
-        users = processEntries(result)
-        saveFile(users,'users.json')
+        result = await importCsv.convert();
+        users = importCsv.processEntries(result)
+        saveFile(users, 'users.json')
+        data = await importCsv.createUserForNonExistedUser(users)
+        saveFile(data.nonExistedUsers, 'nonExistedUsers.json')
+        saveFile(data.existedUsers, 'existedUsers.json')
 
     })
     it('should have entries', async () => {
-        // console.log("result:%O", result);
         assert.equal(result.length, 19936);
         assert.equal(Object.keys(users).length, 7674);
-        // assert.equal(emptyUsers.length, 19937);
-        // assert.equal(existedUsers.length, 19937);
+        assert.equal(Object.keys(data.existedUsers).length, 7674);
+        assert.equal(Object.keys(data.nonExistedUsers).length, 7674);
     });
 
 

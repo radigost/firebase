@@ -32,17 +32,17 @@ const setNewSubscriptionForUser = async (ACCOUNT_ID, USER_PAYLOAD, EVENT) => {
     }
 }
 
-xdescribe('Not a test - just convinient way to check data from production database', () => {
+describe('Not a test - just convinient way to check data from production database', () => {
     let users,subscription
     before("", async () => {
         //change to needed id
-        const id = "vZife-mNYr45WnaSFDnuzJWTqPmkA9ay"
+        const id = "WuXXdkrlqleCp1A6MK_5eg-M3NoyZW4z"
         // user = await getUser(id);
         users = await getUserByServiceUid(id);
         // subscription = await getUserSubscriptionByUserId(id);
     })
     it('should have user accountId', async () => {
-        // console.log("user:%O", users);
+        console.log("user:%O", users);
         // console.log("subscription:%O", subscription);
         assert.equal(users.length,1);
     });
