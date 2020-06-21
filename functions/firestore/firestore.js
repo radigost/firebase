@@ -20,14 +20,21 @@ const db = admin.firestore();
 // logging to firebase
 const logUserEvent = async (accountId, provider = SubscriptionProvider.cloudPayments, payload) => {
     const subscriptionRef = await db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${provider}_${accountId}`);
-    await subscriptionRef.update({
-        events: admin.firestore.FieldValue.arrayUnion(payload)
-    })
-    logger.info(`Added entry for Subscription ${provider}_${accountId}`);
-
-    const serviceUID = (await getUser(accountId)).serviceUID
-    const length = (await getUserSubscriptionByUserId(accountId)).events.length;
+    const snapshot = await subscriptionRef.get();
+    let length
+    if (snapshot.exists) {
+        await subscriptionRef.update({
+            events: admin.firestore.FieldValue.arrayUnion(payload)
+        })
+        logger.info(`Added entry for Subscription ${provider}_${accountId}`);
+        length = (await getUserSubscriptionByUserId(accountId)).events.length;
+    } else {
+        logger.error(`Cannot log subscription event, ${type}_${accountId} does not exist!`)
+        length = 'null'
+        return Promise.resolve(false);
+    }
     const insertId = `cloudPayments_${accountId}_${length}`;
+    const serviceUID = (await getUser(accountId)).serviceUID
     return {insertId, serviceUID};
 }
 

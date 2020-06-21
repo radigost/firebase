@@ -88,7 +88,6 @@ exports.fail = functions.https.onRequest(async (request, response) => {
     return executeEvent(request, response, async () => {
         await changeSubscriptionStatus({accountId: request.body.AccountId, status: SubscriptionStatus.billingRetry})
         const {insertId, serviceUID} = await logUserEvent(request.body.AccountId, SubscriptionProvider.cloudPayments, request.body);
-
         const productId = getProductId(request)
         logFailToAmplitude(request.body, productId, insertId, serviceUID);
     })
