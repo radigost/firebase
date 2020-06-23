@@ -32,7 +32,7 @@ const setNewSubscriptionForUser = async (ACCOUNT_ID, USER_PAYLOAD, EVENT) => {
     }
 }
 
-describe('Not a test - just convinient way to check data from production database', () => {
+xdescribe('Not a test - just convinient way to check data from production database', () => {
     let users,subscription
     before("", async () => {
         //change to needed id

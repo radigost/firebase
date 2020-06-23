@@ -48,38 +48,37 @@ const splitUsers = async (users) => {
             promises.push(firestore.getUserByServiceUid(serviceUID).then((entries) => {
                 if (entries.length === 1) {
                     existedUsers[serviceUID] = users[serviceUID]
-                }
-                else if (entries.length === 0){
+                } else if (entries.length === 0) {
                     nonExistedUsers[serviceUID] = users[serviceUID]
                 }
                 return true
             }).catch(console.error))
         }
-        return Promise.all(promises).then(() => ({nonExistedUsers,existedUsers})).catch(console.error)
+        return Promise.all(promises).then(() => ({nonExistedUsers, existedUsers})).catch(console.error)
     } catch (e) {
         console.error(e.message)
     }
 }
+const parsePeriodFromProductId = (productId = "") => {
+    const possiblePeriod = {'year': 365, 'month': 30, 'halfYear': 183}
+    const daysOfSubscription = productId.split(".").reduce((acc, entry) => possiblePeriod[entry] ? possiblePeriod[entry] : acc, 0)
+    return daysOfSubscription;
+}
 
-// const splitUsersThatAreInDatabase = async (csvEntries = []) => {
-//     const emptyUsersPromises = []
-//     const existedUsersPromises = []
-//     csvEntries.forEach(entry => {
-//         getUserByServiceUid(entry["Q User ID"]).then(users => {
-//             if (!users.length) {
-//                 console.log("user does not exists")
-//                 emptyUsersPromises.push(entry)
-//             } else if (users.length === 1) {
-//                 console.log("user exists")
-//                 existedUsersPromises.push(entry)
-//             } else {
-//                 console.log("more than 1 user (actual - %s) with this service UID:%s!", users.length, users.serviceUID)
-//             }
-//             return
-//         }).catch(console.error)
-//     })
-//     return Promise.all([emptyUsersPromises, existedUsersPromises])
-//
-// }
+const createNewUsersAndSubscriptions = (newUsersMap) => {
+    const qonversionStatusesMap ={
 
-module.exports = {convert, processEntries: mergeEntries, createUserForNonExistedUser: splitUsers}
+    }
+    const fields = {
+        email,
+        name,
+
+            serviceUID,
+            subscriptionStatus,
+
+            subscriptionActiveTill,
+            subscriptions
+    }
+}
+
+module.exports = {convert, processEntries: mergeEntries, createUserForNonExistedUser: splitUsers,parsePeriodFromProductId}

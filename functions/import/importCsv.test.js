@@ -18,7 +18,7 @@ const saveFile = (fileData, filename) => {
     });
 }
 xdescribe('Converting csv to firebase structure', () => {
-    let result, users, nonExistedUsers, existedUsers,data
+    let result, users, nonExistedUsers, existedUsers, data
     before("", async () => {
         result = await importCsv.convert();
         users = importCsv.processEntries(result)
@@ -30,10 +30,22 @@ xdescribe('Converting csv to firebase structure', () => {
     })
     it('should have entries', async () => {
         assert.equal(result.length, 19936);
-        assert.equal(Object.keys(users).length, 7674);
-        assert.equal(Object.keys(data.existedUsers).length, 7674);
-        assert.equal(Object.keys(data.nonExistedUsers).length, 7674);
+        assert.equal(Object.keys(users).length, 7763);
+        assert.equal(Object.keys(data.existedUsers).length, 4);
+        assert.equal(Object.keys(data.nonExistedUsers).length, 6);
     });
 
 
+})
+
+describe('process days of subscription for given productId', () => {
+    it('should parse year', async () => {
+        assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.verv2.year.2790.withTrial'), 365);
+    });
+    it('should parse halfYear', async () => {
+        assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.oldAngry.halfYear.999.withTrial'), 183);
+    });
+    it('should parse month', async () => {
+        assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.verv.month.849.withoutTrial'), 30);
+    });
 })
