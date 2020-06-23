@@ -49,12 +49,15 @@ const logToAmplitude = ({
             city,
             ip,
             productId,
+            user_properties:{
+                is_debug_mode: parseInt(testMode) === 1,
+            },
             event_properties: {
                 transactionId,
                 amount: Math.abs(amount),
                 currency,
                 testMode,
-                is_debug_mode: parseInt(testMode) === 1,
+
                 successfulTransactionsNumber,
                 reason,
                 utm_source,
