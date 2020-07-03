@@ -1,9 +1,10 @@
-const USER_COLLECTION = 'users'
-const SUBSCRIPTIONS_COLLECTION = 'subscriptions'
+const USER_COLLECTION = 'testUsers'
+const SUBSCRIPTIONS_COLLECTION = 'testSubscriptions'
+const DEVICES_COLLECTION = 'testDevices'
 
 const admin = require('firebase-admin');
 let FieldValue = require('firebase-admin').firestore.FieldValue;
-
+const _ = require('lodash')
 const add = require('date-fns/add');
 const getUnixTime = require('date-fns/getUnixTime');
 const {get, isEqual, toNumber} = require('lodash');
@@ -14,24 +15,74 @@ const SubscriptionProvider = require('../domain/SubscriptionProvider');
 const {logger} = require('../logger')
 
 admin.initializeApp();
-const db = admin.firestore();
+const db = require('./db').getDb();
 
 
 // logging to firebase
-const logUserEvent = async (accountId, provider = SubscriptionProvider.cloudPayments, payload) => {
-    const subscriptionRef = await db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${provider}_${accountId}`);
+const logUserEvent = async (uid, provider = SubscriptionProvider.cloudPayments, payload) => {
+    const subscriptionRef = await db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${provider}_${uid}`);
     await subscriptionRef.update({
         events: admin.firestore.FieldValue.arrayUnion(payload)
     })
-    logger.info(`Added entry for Subscription ${provider}_${accountId}`);
+    logger.info(`Added entry for Subscription ${provider}_${uid}`);
 
-    const serviceUID = (await getUser(accountId)).serviceUID
-    const length = (await getUserSubscriptionByUserId(accountId)).events.length;
-    const insertId = `cloudPayments_${accountId}_${length}`;
+    const serviceUID = (await getUser(uid)).serviceUID
+    const res = await getUserSubscriptionByUserId(uid);
+    const length = res.events ? res.events.length : 0
+    const insertId = `cloudPayments_${uid}_${length}`;
     return {insertId, serviceUID};
 }
 
-// services
+//users
+const createNewDevice = async ({serviceUID}) => {
+    const data = {serviceUID}
+    let docRef
+    if (serviceUID) {
+        docRef = await db.collection(DEVICES_COLLECTION).doc(serviceUID)
+        const doc = await docRef.get();
+        if (!doc.exists) {
+            await docRef.set(data)
+        }
+
+    } else {
+        docRef = await db.collection(DEVICES_COLLECTION).doc(serviceUID).set(data)
+    }
+    return docRef.id
+}
+
+
+// subscriptions
+const startNewSubscriptionForDevice = async ({type, productId, activeTill, deviceId, status}) => {
+    logger.debug(`Starting new ${type} subscription for device ${deviceId}`);
+    const deviceRef = await db.collection(DEVICES_COLLECTION).doc(deviceId)
+
+    const doc = await deviceRef.get();
+    const data = doc.data()
+    if (data && !data.subscriptions) {
+        await deviceRef.update({
+            subscriptions: []
+        })
+    }
+
+    const newSubscriptionData = {
+        owner: [deviceRef],
+        type,
+        productId,
+        events: []
+    }
+    if (status) {
+        Object.assign(newSubscriptionData, {status})
+    }
+    if (activeTill || isEqual(toNumber(activeTill), 0)) {
+        Object.assign(newSubscriptionData, {activeTill})
+    }
+    const subscription = await db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${type}_${deviceId}`).set(newSubscriptionData, {merge: true})
+
+    await deviceRef.update({
+        'subscriptions': admin.firestore.FieldValue.arrayUnion(db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${type}_${deviceId}`))
+    })
+    return db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${type}_${deviceId}`)
+}
 const startNewSubscriptionForUser = async ({accountId, email, type, productId, activeTill}) => {
     logger.debug(`Starting new subscription for user ${accountId}`);
     const userRef = await db.collection(USER_COLLECTION).doc(accountId)
@@ -41,15 +92,18 @@ const startNewSubscriptionForUser = async ({accountId, email, type, productId, a
             subscriptions: []
         })
     }
+
     const data = {
         users: [db.collection(USER_COLLECTION).doc(`${accountId}`)],
-        email,
         type,
         productId,
         status: SubscriptionStatus.active,
         events: []
     }
-    if (activeTill) {
+    if (email) {
+        Object.assign(data, {email})
+    }
+    if (activeTill || isEqual(toNumber(activeTill), 0)) {
         Object.assign(data, {activeTill})
     }
     await db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${type}_${accountId}`).set(data, {merge: true})
@@ -62,8 +116,14 @@ const startNewSubscriptionForUser = async ({accountId, email, type, productId, a
 
 }
 
-const changeSubscriptionStatus = async ({accountId, status, activeTill, productId}) => {
-    const type = SubscriptionProvider.cloudPayments;
+const changeSubscriptionStatus = async (
+    {
+        uid,
+        status,
+        activeTill,
+        productId,
+        type = SubscriptionProvider.cloudPayments
+    }) => {
     const event = {status}
     if (activeTill || isEqual(toNumber(activeTill), 0)) {
         event.activeTill = activeTill;
@@ -71,20 +131,26 @@ const changeSubscriptionStatus = async ({accountId, status, activeTill, productI
     if (productId) {
         event.productId = productId;
     }
-    logger.debug(`Changing status for subscriptions ${type}_${accountId} on ${status}`)
-    const subscriptionRef = db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${type}_${accountId}`)
+    logger.debug(`Changing status for subscriptions ${type}_${uid} on ${status}`)
+    const subscriptionRef = db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${type}_${uid}`)
     const snapshot = await subscriptionRef.get();
     if (snapshot.exists) {
         return subscriptionRef.update(event);
     } else {
-        logger.error(`Cannot change status of subscription, ${type}_${accountId} does not exist!`)
+        logger.error(`Cannot change status of subscription, ${type}_${uid} does not exist!`)
         return Promise.resolve();
     }
-
-
 }
 
 //
+
+const getOwner = async (subscriptionRef) => {
+    const snapshot = await subscriptionRef.get()
+    const data = snapshot.data()
+
+    const deviceDoc = await db.doc(_.head(data.owner).path).get()
+    return deviceDoc
+}
 const getUserSubscriptionByUserId = async (id, provider = SubscriptionProvider.cloudPayments) => {
     try {
         const doc = await db.collection(SUBSCRIPTIONS_COLLECTION).doc(`${provider}_${id}`).get();
@@ -163,5 +229,8 @@ module.exports = {
     SubscriptionProvider,
     getPeriodFromPayload,
     changeSubscriptionStatus,
-    getUserByServiceUid
+    getUserByServiceUid,
+    createNewDevice,
+    startNewSubscriptionForDevice,
+    getOwner
 }

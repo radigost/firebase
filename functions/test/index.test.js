@@ -7,7 +7,6 @@
 
 // test.mockConfig({ amplitude: { api_key: process.env.AMPLITUDE_API_KEY } });
 
-
 // require('./amplitudeTests');
 require('../firestore/firestore.test');
 require('../import/importCsv.test');

@@ -36,12 +36,12 @@ xdescribe('Not a test - just convinient way to check data from production databa
     let users,subscription
     before("", async () => {
         //change to needed id
-        const id = "WuXXdkrlqleCp1A6MK_5eg-M3NoyZW4z"
+        const id = "CYHs3Y1r-TpAEZR3MODoJ8DKGCN56c7v"
         // user = await getUser(id);
         users = await getUserByServiceUid(id);
         // subscription = await getUserSubscriptionByUserId(id);
     })
-    it('should have user accountId', async () => {
+    it('should have user uid', async () => {
         console.log("user:%O", users);
         // console.log("subscription:%O", subscription);
         assert.equal(users.length,1);
@@ -67,7 +67,7 @@ xdescribe('Firebase', () => {
             await setNewSubscriptionForUser(ACCOUNT_ID, USER_PAYLOAD, EVENT)
             user = await getUser(ACCOUNT_ID);
         })
-        it('should have user accountId', async () => {
+        it('should have user uid', async () => {
             assert.equal(user.accountId, ACCOUNT_ID);
         });
         it('should not have subscriptions array for new user', async () => {
