@@ -35,15 +35,15 @@ const mergeEntries = (csvEntries = []) => {
     return users
 }
 
-const splitUsers = async (users) => {
+const splitUsers = async (users, entriesToCheck) => {
     console.time('Split users between existed and not existed')
     try {
         const promises = []
         const nonExistedUsers = {}
         const existedUsers = {}
         const keys = Object.keys(users)
-        const ENTRIES_TO_CHECK = 10
-        for (let i = 0; i < ENTRIES_TO_CHECK; i++) {
+        entriesToCheck = entriesToCheck || Object.keys(users).length
+        for (let i = 0; i < entriesToCheck; i++) {
             const serviceUID = keys[i]
             console.log("Checking if user with serviceUID %s is in users table", serviceUID)
             promises.push(firestore.getUserByServiceUid(serviceUID).then((entries) => {
@@ -84,19 +84,19 @@ const batchCreateNewSubscriptionForDevices = async (users) => {
     }, []))
 }
 
-const processEventsForDevices = async (users, subscriptionReferences) => {
-    return _.reduce(subscriptionReferences, async (result, subscriptionRef, key) => {
-        console.debug({path: subscriptionRef.path})
+const processEventsForDevices = async (mergedUsers, subscriptionReferences) => {
+    console.time('processing events')
+    for (let subscriptionRef of subscriptionReferences) {
         const owner = await firestore.getOwner(subscriptionRef)
         const {serviceUID} = owner.data()
-        const userEvents = _.get(users, [serviceUID, 'events'])
-        // console.log({userEvents})
+        const userEvents = _.get(mergedUsers, [serviceUID, 'events'])
 
-        _.forEach(userEvents, async (event) => {
+        for (let event of userEvents) {
             const {'Event Name': eventName, 'Product ID': productId,} = event
             const status = ITunesStatusToSystemStatusesMap[eventName]
 
             const dateValue = event["Event Date"]
+
             const date = new Date(dateValue)
             const periods = parsePeriodFromProductId(productId)
             let property
@@ -106,35 +106,42 @@ const processEventsForDevices = async (users, subscriptionReferences) => {
                 property = 'subscriptionLength'
             }
 
-            const entry = {
+            const payload = {
                 uid: owner.id,
                 status,
                 productId,
                 type: SubscriptionProvider.iTunes,
                 activeTill: getUnixTime(add(date, {days: periods[property] || 0})),
             }
-            // console.log({entry})
-            await firestore.changeSubscriptionStatus(entry)
-            // await firestore.logUserEvent({path: subscriptionRef.path, accountId, SubscriptionProvider.iTunes, event});
-        })
+            const eventAlreadyExistsInSubscription = await firestore.isEventAlreadyExistsInSubscription(
+                subscriptionRef,
+                event,
+                ['Event Name', 'Transaction Date']
+            )
+            if (!eventAlreadyExistsInSubscription) {
+                await firestore.changeSubscriptionStatus(subscriptionRef, payload)
+                await firestore.logUserEvent({
+                    subscriptionRef,
+                    provider: SubscriptionProvider.iTunes,
+                    payload: event,
+                    owner
+                });
+            } else {
+                console.debug(`event already exists `)
+            }
+        }
 
-
-    }, [])
-
-    // get device
-    // get his subscription
-    // update subscription's status and activeTill
-    // add event to events array
-
-
+    }
+    console.timeEnd('processing events')
 }
+
 
 module.exports = {
     convert,
     mergeEntries,
     splitUsers,
     parsePeriodFromProductId,
-    batchCreateDevices: batchCreateDevices,
+    batchCreateDevices,
     batchCreateNewSubscriptionForDevices,
-    processEventsForDevices: processEventsForDevices
+    processEventsForDevices
 }

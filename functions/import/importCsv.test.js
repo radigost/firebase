@@ -1,16 +1,7 @@
 const firebase = require("@firebase/testing");
-function authedApp(auth) {
-    return firebase
-        .initializeTestApp({ projectId: 'test-project', auth })
-        .firestore();
-}
-const db = require('../firestore/db')
 
-const test = require('firebase-functions-test')({
-    projectId: 'mo-meditations-firebase'
-});
-const USER_COLLECTION = 'testUsers'
-const SUBSCRIPTIONS_COLLECTION = 'testSubscriptions'
+const SubscriptionStatus = require('../domain/SubscriptionStatus')
+const db = require('../firestore/db')
 const fs = require('fs');
 const _ = require("lodash")
 const assert = require('chai').assert;
@@ -25,31 +16,43 @@ const saveFile = (fileData, filename) => {
         console.log(`The file ${filename} was saved!`);
     });
 }
-describe("import",()=>{
+describe("import", () => {
     function authedApp(auth) {
         return firebase
-            .initializeTestApp({ projectId: 'test-project', auth })
+            .initializeTestApp({projectId: 'test-project', auth})
             .firestore();
     }
-    // before(() => {
-    //     db.setDb(authedApp(null));
-    // });
+
+    before(() => {
+        db.setDb(authedApp(null));
+    });
 
     before(async () => {
         // Clear the database before each test
-        await firebase.clearFirestoreData({ projectId: 'test-project' });
+        await firebase.clearFirestoreData({projectId: 'test-project'});
     });
 
     after(async () => {
         await Promise.all(firebase.apps().map(app => app.delete()));
     });
+    describe('process days of subscription for given productId', () => {
+        it('should parse year', async () => {
+            assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.verv2.year.2790.withTrial').subscriptionLength, 366);
+        });
+        it('should parse halfYear', async () => {
+            assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.oldAngry.halfYear.999.withTrial').subscriptionLength, 183);
+        });
+        it('should parse month', async () => {
+            assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.verv.month.849.withoutTrial').subscriptionLength, 31);
+        });
+    })
     xdescribe('Converting csv to firebase structure', () => {
         let result, users, nonExistedUsers, existedUsers, data
         before("", async () => {
             result = await importCsv.convert();
             users = importCsv.mergeEntries(result)
             saveFile(users, 'users.json')
-            data = await importCsv.splitUsers(users)
+            data = await importCsv.splitUsers(users, 10)
             saveFile(data.nonExistedUsers, 'test-nonExistedUsers.json')
             saveFile(data.existedUsers, 'test-existedUsers.json')
 
@@ -73,35 +76,41 @@ describe("import",()=>{
     })
 
     describe('Add subscriptions for non-existed users and link them to devices ', () => {
-        let nonExistedUsers, subscriptions,devicesIds
+        let nonExistedUsers, subscriptionsRefs
         before("preapare files", async () => {
             nonExistedUsers = fs.readFileSync('test-nonExistedUsers.json', 'utf8');
-            devicesIds = await importCsv.batchCreateDevices(JSON.parse(nonExistedUsers))
         })
         it('should create all batch subscriptions from passed collections', async () => {
-            subscriptions = await importCsv.batchCreateNewSubscriptionForDevices(JSON.parse(nonExistedUsers))
-            assert.equal(subscriptions.length, _.keys(JSON.parse(nonExistedUsers)).length);
+            subscriptionsRefs = await importCsv.batchCreateNewSubscriptionForDevices(JSON.parse(nonExistedUsers))
+            assert.equal(subscriptionsRefs.length, _.keys(JSON.parse(nonExistedUsers)).length);
         })
         it('should fill all events in users and update subscription', async () => {
             // TODO - important - it must work with users too!
-            // TODO - test the order of entries is right
-            const updatedSubscriptions = await importCsv.processEventsForDevices(JSON.parse(nonExistedUsers), subscriptions)
-            console.log({updatedSubscriptions})
-            assert.equal(updatedSubscriptions.length, _.keys(JSON.parse(nonExistedUsers)).length);
+            const expectedRes = {
+                'iTunes_zvMd6O77svx8DM_wOSjot4Dty1wMGwWa': SubscriptionStatus.active,
+                'iTunes_M9Bphf8XvZfAhIVgKOqjMQVuNboY7qe0': SubscriptionStatus.cancelled,
+                'iTunes_mBJps-GHqXDHjkWrSx6dvBFDpTgbSFD_': SubscriptionStatus.cancelled,
+                'iTunes_-y7h8MLRJSARIj_cbvgXl35ZzxKPwvX8': SubscriptionStatus.active,
+                'iTunes_7P81UurUufD7iSLkQ3GdTHKMFWCsbV41': SubscriptionStatus.cancelled,
+                'iTunes_kAzcSnNXqY8AKVTm4izJqTECljOfoM2h': SubscriptionStatus.active
+
+            }
+            await importCsv.processEventsForDevices(JSON.parse(nonExistedUsers), subscriptionsRefs)
+            const getDocs = (_subscriptionsRefs) => {
+                const res = _subscriptionsRefs.map(ref => {
+                    return ref.get().then(snapshot => snapshot);
+                })
+                return res
+            }
+            const subscriptionsSnapshots = await Promise.all(getDocs(subscriptionsRefs))
+            _.forEach(subscriptionsSnapshots, (snapshot) => {
+                const data = snapshot.data()
+                assert.equal(data.status, expectedRes[snapshot.id]);
+            })
         })
     })
 
 
-    xdescribe('process days of subscription for given productId', () => {
-        it('should parse year', async () => {
-            assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.verv2.year.2790.withTrial'), 365);
-        });
-        it('should parse halfYear', async () => {
-            assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.oldAngry.halfYear.999.withTrial'), 183);
-        });
-        it('should parse month', async () => {
-            assert.equal(importCsv.parsePeriodFromProductId('app.momeditation.mo.subscription.verv.month.849.withoutTrial'), 30);
-        });
-    })
+
 
 })
