@@ -1,0 +1,188 @@
+{
+  "h2r8P3Wv2-KFcyTJI3C8jf-CSbzOD5DT": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 00:01:11",
+        "Event Name": "Trial Started",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589403671",
+        "Q User ID": "h2r8P3Wv2-KFcyTJI3C8jf-CSbzOD5DT",
+        "Device": "iPhone SE",
+        "Device ID": "4CA4B651-C330-4A03-AE48-A4BCF0C72472",
+        "Local": "Russian",
+        "OS Version": "ios 13.4.1"
+      },
+      {
+        "Event Date": "2020-05-14 00:01:11",
+        "Event Name": "Trial Canceled",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589403671",
+        "Q User ID": "h2r8P3Wv2-KFcyTJI3C8jf-CSbzOD5DT",
+        "Device": "iPhone SE",
+        "Device ID": "4CA4B651-C330-4A03-AE48-A4BCF0C72472",
+        "Local": "Russian",
+        "OS Version": "ios 13.4.1"
+      }
+    ]
+  },
+  "DPcla9irZ1CrVcagiANQk377KiodAHlF": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 00:21:47",
+        "Event Name": "Trial Started",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404907",
+        "Q User ID": "DPcla9irZ1CrVcagiANQk377KiodAHlF",
+        "Device": "iPhone 8",
+        "Device ID": "776C0D55-BE18-4E7B-A3E8-38EC8785F40C",
+        "Local": "Russian",
+        "OS Version": "ios 13.3.1"
+      },
+      {
+        "Event Date": "2020-05-14 00:21:47",
+        "Event Name": "Trial Still Active",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404907",
+        "Q User ID": "DPcla9irZ1CrVcagiANQk377KiodAHlF",
+        "Device": "iPhone 8",
+        "Device ID": "776C0D55-BE18-4E7B-A3E8-38EC8785F40C",
+        "Local": "Russian",
+        "OS Version": "ios 13.3.1"
+      },
+      {
+        "Event Date": "2020-05-14 00:21:47",
+        "Event Name": "Trial Billing Retry",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404907",
+        "Q User ID": "DPcla9irZ1CrVcagiANQk377KiodAHlF",
+        "Device": "iPhone 8",
+        "Device ID": "776C0D55-BE18-4E7B-A3E8-38EC8785F40C",
+        "Local": "Russian",
+        "OS Version": "ios 13.3.1"
+      }
+    ]
+  },
+  "CYHs3Y1r-TpAEZR3MODoJ8DKGCN56c7v": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 00:11:37",
+        "Event Name": "Trial Started",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404297",
+        "Q User ID": "CYHs3Y1r-TpAEZR3MODoJ8DKGCN56c7v",
+        "Device": "iPhone 11 Pro",
+        "Device ID": "2D95360F-8EDB-4827-B613-8241BD620F4D",
+        "Local": "ru_RU",
+        "OS Version": "iOS 13.3.1"
+      },
+      {
+        "Event Date": "2020-05-14 00:11:37",
+        "Event Name": "Trial Still Active",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404297",
+        "Q User ID": "CYHs3Y1r-TpAEZR3MODoJ8DKGCN56c7v",
+        "Device": "iPhone 11 Pro",
+        "Device ID": "2D95360F-8EDB-4827-B613-8241BD620F4D",
+        "Local": "ru_RU",
+        "OS Version": "iOS 13.3.1"
+      },
+      {
+        "Event Date": "2020-05-14 00:11:37",
+        "Event Name": "Trial Canceled",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404297",
+        "Q User ID": "CYHs3Y1r-TpAEZR3MODoJ8DKGCN56c7v",
+        "Device": "iPhone 11 Pro",
+        "Device ID": "2D95360F-8EDB-4827-B613-8241BD620F4D",
+        "Local": "ru_RU",
+        "OS Version": "iOS 13.3.1"
+      }
+    ]
+  },
+  "WuXXdkrlqleCp1A6MK_5eg-M3NoyZW4z": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 01:51:27",
+        "Event Name": "Trial Converted",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "2790",
+        "Currency": "RUB",
+        "Proceeds": "1953",
+        "Refund": "0",
+        "Transaction Date": "1589410287",
+        "Q User ID": "WuXXdkrlqleCp1A6MK_5eg-M3NoyZW4z",
+        "Device": "iPhone 11 Pro",
+        "Device ID": "A562B1ED-5F28-4869-9813-49CEC21C806C",
+        "Local": "Russian",
+        "OS Version": "ios 13.3.1"
+      },
+      {
+        "Event Date": "2020-05-14 01:51:27",
+        "Event Name": "Subscription Canceled",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "2790",
+        "Currency": "RUB",
+        "Proceeds": "1953",
+        "Refund": "0",
+        "Transaction Date": "1589410287",
+        "Q User ID": "WuXXdkrlqleCp1A6MK_5eg-M3NoyZW4z",
+        "Device": "iPhone 11 Pro",
+        "Device ID": "A562B1ED-5F28-4869-9813-49CEC21C806C",
+        "Local": "Russian",
+        "OS Version": "ios 13.3.1"
+      }
+    ]
+  }
+}

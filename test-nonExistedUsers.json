@@ -1,0 +1,179 @@
+{
+  "zvMd6O77svx8DM_wOSjot4Dty1wMGwWa": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 00:13:34",
+        "Event Name": "Trial Converted",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv30.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "2790",
+        "Currency": "RUB",
+        "Proceeds": "1953",
+        "Refund": "0",
+        "Transaction Date": "1589404414",
+        "Q User ID": "zvMd6O77svx8DM_wOSjot4Dty1wMGwWa",
+        "Device": "iPhone 11",
+        "Device ID": "AAE15AB7-AB90-4DD8-899D-C307E8736934",
+        "Local": "ru_RU",
+        "OS Version": "iOS 13.3.1"
+      }
+    ]
+  },
+  "M9Bphf8XvZfAhIVgKOqjMQVuNboY7qe0": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 00:22:53",
+        "Event Name": "Trial Started",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404973",
+        "Q User ID": "M9Bphf8XvZfAhIVgKOqjMQVuNboY7qe0",
+        "Device": "iPhone XR",
+        "Device ID": "6EE0B887-F917-43A9-90F9-0CB67B24FBE5",
+        "Local": "Russian",
+        "OS Version": "ios 13.4.1"
+      },
+      {
+        "Event Date": "2020-05-14 00:22:53",
+        "Event Name": "Trial Canceled",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404973",
+        "Q User ID": "M9Bphf8XvZfAhIVgKOqjMQVuNboY7qe0",
+        "Device": "iPhone XR",
+        "Device ID": "6EE0B887-F917-43A9-90F9-0CB67B24FBE5",
+        "Local": "Russian",
+        "OS Version": "ios 13.4.1"
+      }
+    ]
+  },
+  "7P81UurUufD7iSLkQ3GdTHKMFWCsbV41": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 00:23:14",
+        "Event Name": "Trial Started",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404994",
+        "Q User ID": "7P81UurUufD7iSLkQ3GdTHKMFWCsbV41",
+        "Device": "iPhone XS",
+        "Device ID": "C16B25CE-1D54-4B7A-BE83-00DB525CB972",
+        "Local": "Russian",
+        "OS Version": "ios 13.3"
+      },
+      {
+        "Event Date": "2020-05-14 00:23:14",
+        "Event Name": "Trial Canceled",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404994",
+        "Q User ID": "7P81UurUufD7iSLkQ3GdTHKMFWCsbV41",
+        "Device": "iPhone XS",
+        "Device ID": "C16B25CE-1D54-4B7A-BE83-00DB525CB972",
+        "Local": "Russian",
+        "OS Version": "ios 13.3"
+      }
+    ]
+  },
+  "kAzcSnNXqY8AKVTm4izJqTECljOfoM2h": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 02:49:13",
+        "Event Name": "Trial Converted",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "2790",
+        "Currency": "RUB",
+        "Proceeds": "1953",
+        "Refund": "0",
+        "Transaction Date": "1589413753",
+        "Q User ID": "kAzcSnNXqY8AKVTm4izJqTECljOfoM2h",
+        "Device": "iPhone XR",
+        "Device ID": "60CB2083-2BC6-4455-A4C5-076221850CCD",
+        "Local": "Russian",
+        "OS Version": "ios 13.4.1"
+      }
+    ]
+  },
+  "mBJps-GHqXDHjkWrSx6dvBFDpTgbSFD_": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 00:21:30",
+        "Event Name": "Trial Started",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404890",
+        "Q User ID": "mBJps-GHqXDHjkWrSx6dvBFDpTgbSFD_",
+        "Device": "iPhone 5s",
+        "Device ID": "5963C1E9-16D0-4481-9992-927C59411FCB",
+        "Local": "Russian",
+        "OS Version": "ios 12.4.5"
+      },
+      {
+        "Event Date": "2020-05-14 00:21:30",
+        "Event Name": "Trial Canceled",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "0",
+        "Currency": "RUB",
+        "Proceeds": "0",
+        "Refund": "0",
+        "Transaction Date": "1589404890",
+        "Q User ID": "mBJps-GHqXDHjkWrSx6dvBFDpTgbSFD_",
+        "Device": "iPhone 5s",
+        "Device ID": "5963C1E9-16D0-4481-9992-927C59411FCB",
+        "Local": "Russian",
+        "OS Version": "ios 12.4.5"
+      }
+    ]
+  },
+  "-y7h8MLRJSARIj_cbvgXl35ZzxKPwvX8": {
+    "events": [
+      {
+        "Event Date": "2020-05-14 01:01:38",
+        "Event Name": "Trial Converted",
+        "App Name": "Mo Meditation",
+        "Product ID": "app.momeditation.mo.subscription.verv2.year.2790.withTrial",
+        "Subscription Group": "20527563",
+        "Price": "2790",
+        "Currency": "RUB",
+        "Proceeds": "1953",
+        "Refund": "0",
+        "Transaction Date": "1589407298",
+        "Q User ID": "-y7h8MLRJSARIj_cbvgXl35ZzxKPwvX8",
+        "Device": "iPhone XS Max",
+        "Device ID": "1F0B4A16-9179-4216-A08C-56B3F78AC5A2",
+        "Local": "Russian",
+        "OS Version": "ios 13.3.1"
+      }
+    ]
+  }
+}

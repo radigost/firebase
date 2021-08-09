@@ -1,0 +1,15 @@
+{
+  "mailchimp": {
+    "audience": "43397d9f49",
+    "apikey": "e0382a11e4a0ba8969c8d5dbbc39e774-us3"
+  },
+  "keys": {
+    "signing": "Basic 7E85KB6O9EDH0AKGUTZ21A7UKWXFLEOF"
+  },
+  "cloudpayments": {
+    "api_secret": "1ca0548189ce81ca606fb8cc59ecd15f"
+  },
+  "amplitude": {
+    "api_key": "1a3916bb0f900c1cc9b30be99e61d2db"
+  }
+}
